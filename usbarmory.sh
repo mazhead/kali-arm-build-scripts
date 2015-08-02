@@ -30,7 +30,7 @@ unset CROSS_COMPILE
 arm="abootimg cgpt fake-hwclock ntpdate vboot-utils vboot-kernel-utils uboot-mkimage"
 base="kali-menu kali-defaults initramfs-tools sudo parted e2fsprogs usbutils"
 desktop="xfce4 network-manager network-manager-gnome xserver-xorg-video-fbdev"
-tools="passing-the-hash winexe aircrack-ng hydra john sqlmap wireshark libnfc-bin mfoc nmap ethtool usbutils"
+tools="passing-the-hash winexe aircrack-ng hydra john sqlmap wireshark libnfc-bin mfoc nmap ethtool usbutils wifite"
 services="openssh-server apache2 shellinabox vim-nox cryptsetup lvm2"
 extras="iceweasel wpasupplicant"
 
@@ -168,7 +168,7 @@ device="/dev/mapper/${device}"
 rootp=${device}p1
 
 # Create file systems
-mkfs.ext2 $rootp
+mkfs.ext4 $rootp
 
 # Create the dirs for the partitions and mount them
 mkdir -p ${basedir}/root
@@ -176,6 +176,9 @@ mount $rootp ${basedir}/root
 
 echo "Rsyncing rootfs into image file"
 rsync -HPavz -q ${basedir}/kali-$architecture/ ${basedir}/root/
+
+# Enable login over serial
+echo "T0:23:respawn:/sbin/getty -L console 115200 vt100" >> ${basedir}/root/etc/inittab
 
 cat << EOF > ${basedir}/root/etc/modules
 ledtrig_heartbeat
